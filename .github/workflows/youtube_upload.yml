@@ -1,0 +1,47 @@
+name: YouTube Video Uploader
+
+on:
+  workflow_run:
+    workflows: ["AI Documentary Automation Pipeline"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install google-api-python-client google-auth-oauthlib google-auth-httplib2
+
+    - name: Download video artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: final-documentary-video
+        path: output/
+
+    - name: Prepare YouTube Client Secrets
+      run: |
+        echo "${{ secrets.YOUTUBE_CLIENT_SECRETS }}" > client_secrets.json
+        echo "YOUTUBE_CLIENT_SECRETS_FILE=client_secrets.json" >> $GITHUB_ENV
+
+    - name: Run YouTube Uploader
+      env:
+        YOUTUBE_VIDEO_PATH: output/final_video.mp4
+        YOUTUBE_TITLE: "Your AI Generated Documentary Title"
+        YOUTUBE_DESCRIPTION: "This is an AI-generated documentary video. #AI #Documentary #Automation"
+        YOUTUBE_TAGS: "AI,documentary,automation,youtube,trending"
+        YOUTUBE_THUMBNAIL_PATH: assets/thumbnail.jpg # Ensure you place your thumbnail here
+      run: python youtube_uploader.py
