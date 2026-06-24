@@ -10,7 +10,7 @@ def create_concat_file(scenes, image_map):
             img_path = image_map.get(scene["id"])
             if img_path:
                 f.write(f"file '{img_path}'\n")
-                f.write(f"duration {scene["end"] - scene["start"]}\n")
+                f.write(f"duration {scene['end'] - scene['start']}\n")
     return concat_file_path
 
 def apply_ken_burns(input_image, output_video, duration):
@@ -37,7 +37,7 @@ def create_video(scenes, image_map):
         img_path = image_map.get(scene["id"])
         if img_path:
             duration = scene["end"] - scene["start"]
-            output_segment_path = os.path.join(TEMP_DIR, f"segment_{scene["id"]:03d}.mp4")
+            output_segment_path = os.path.join(TEMP_DIR, f"segment_{scene['id']:03d}.mp4")
             
             # Apply Ken Burns effect to each image segment
             try:
