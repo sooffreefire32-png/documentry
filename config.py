@@ -4,7 +4,7 @@ import os
 GH_TOKEN = os.environ.get("GH_TOKEN")
 CLOUDFLARE_API_KEY = os.environ.get("CLOUDFLARE_API_KEY")
 CLOUDFLARE_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
-CLOUDFLARE_API_URL = f"https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/bytedance/sdxl-lightning"
+CLOUDFLARE_API_URL = "https://aiimagegenerationapi.sooffreefire32.workers.dev/"
 
 # Paths
 ASSETS_DIR = "assets"

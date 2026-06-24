@@ -17,13 +17,13 @@ def generate_image(prompt, scene_id):
     for attempt in range(max_retries):
         try:
             response = requests.post(CLOUDFLARE_API_URL, headers=headers, json=payload)
-            if response.status_status == 200:
+            if response.status_code == 200:
                 image_path = os.path.join(IMAGE_OUTPUT_DIR, f"scene_{scene_id:03d}.png")
                 with open(image_path, "wb") as f:
                     f.write(response.content)
                 return image_path
             else:
-                print(f"Attempt {attempt + 1} failed: {response.text}")
+                print(f"Attempt {attempt + 1} failed with status {response.status_code}: {response.text}")
         except Exception as e:
             print(f"Error on attempt {attempt + 1}: {e}")
         time.sleep(2)
