@@ -32,7 +32,20 @@ jobs:
         name: final-documentary-video
         path: output/
 
+    - name: Download SEO data artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: pipeline-reports # This artifact contains youtube_seo_data.json
+        path: output/
 
+    - name: Load SEO data
+      id: seo_data
+      run: |
+        SEO_DATA=$(cat output/youtube_seo_data.json)
+        echo "title=$(echo $SEO_DATA | jq -r '.title')" >> $GITHUB_OUTPUT
+        echo "description=$(echo $SEO_DATA | jq -r '.description')" >> $GITHUB_OUTPUT
+        echo "tags=$(echo $SEO_DATA | jq -r '.tags')" >> $GITHUB_OUTPUT
+        echo "scheduled_publish_at=$(echo $SEO_DATA | jq -r '.scheduled_publish_at')" >> $GITHUB_OUTPUT
 
     - name: Run YouTube Uploader
       env:
@@ -40,8 +53,9 @@ jobs:
         YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
         YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         YOUTUBE_VIDEO_PATH: output/final_video.mp4
-        YOUTUBE_TITLE: "Your AI Generated Documentary Title"
-        YOUTUBE_DESCRIPTION: "This is an AI-generated documentary video. #AI #Documentary #Automation"
-        YOUTUBE_TAGS: "AI,documentary,automation,youtube,trending"
+        YOUTUBE_TITLE: ${{ steps.seo_data.outputs.title }}
+        YOUTUBE_DESCRIPTION: ${{ steps.seo_data.outputs.description }}
+        YOUTUBE_TAGS: ${{ steps.seo_data.outputs.tags }}
         YOUTUBE_THUMBNAIL_PATH: assets/thumbnail.jpg # Ensure you place your thumbnail here
+        YOUTUBE_SCHEDULED_PUBLISH_AT: ${{ steps.seo_data.outputs.scheduled_publish_at }}
       run: python youtube_uploader.py

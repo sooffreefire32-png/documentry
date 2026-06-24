@@ -48,3 +48,4 @@ jobs:
         path: |
           temp/timeline.json
           output/images/
+          output/youtube_seo_data.json
