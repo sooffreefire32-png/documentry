@@ -20,8 +20,8 @@ def generate_seo_metadata(transcript, video_duration_seconds):
     # Parse generated_content into title, description, tags
 
     # For now, using a simple placeholder based on the first few words of the transcript
-    default_title = f"AI Documentary: {transcript.split(". ")[0][:70]}..."
-    default_description = f"This AI-generated documentary explores {transcript.split(". ")[0]}...\n\n#AI #Documentary #Automation #YouTube"
+    default_title = f"AI Documentary: {transcript.split('. ')[0][:70]}..."
+    default_description = f"This AI-generated documentary explores {transcript.split('. ')[0]}...\n\n#AI #Documentary #Automation #YouTube"
     default_tags = ["AI", "Documentary", "Automation", "YouTube", "Trending", "Film", "Technology"]
 
     return {

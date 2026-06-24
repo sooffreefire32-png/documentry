@@ -73,7 +73,7 @@ def upload_video(
         if status:
             print(f"Uploaded {int(status.resumable_progress * 100)}%")
 
-    print(f"Video upload complete. Video ID: {response["id"]}")
+    print(f"Video upload complete. Video ID: {response['id']}")
 
     if thumbnail_path and os.path.exists(thumbnail_path):
         print(f"Uploading thumbnail: {thumbnail_path}")
