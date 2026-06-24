@@ -4,32 +4,38 @@ import googleapiclient.discovery
 import googleapiclient.errors
 import datetime
 import json
+from google.oauth2.credentials import Credentials
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 
 def get_authenticated_service():
-    # Disable OAuthlib's HTTPS verification when running locally.
-    # DO NOT leave this option enabled in production.
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    client_id = os.environ.get("YOUTUBE_CLIENT_ID")
+    client_secret = os.environ.get("YOUTUBE_CLIENT_SECRET")
+    refresh_token = os.environ.get("YOUTUBE_REFRESH_TOKEN")
 
-    client_secrets_file = os.environ.get("YOUTUBE_CLIENT_SECRETS_FILE")
-    if not client_secrets_file or not os.path.exists(client_secrets_file):
-        print("Error: YOUTUBE_CLIENT_SECRETS_FILE environment variable not set or file not found.")
-        print("Please ensure you have client_secrets.json in your repository and set the environment variable.")
+    if not all([client_id, client_secret, refresh_token]):
+        print("Error: YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET, or YOUTUBE_REFRESH_TOKEN environment variables not set.")
         return None
 
-    flow = google_auth_oauthlib.flow.InstalledAppFlow(
-        client_secrets_file,
-        SCOPES
+    credentials = Credentials(
+        token=None,  # Access token will be refreshed
+        refresh_token=refresh_token,
+        client_id=client_id,
+        client_secret=client_secret,
+        token_uri="https://oauth2.googleapis.com/token"
     )
-    credentials = flow.run_local_server(port=0)
-    return googleapiclient.discovery.build(
-        "youtube", "v3", credentials=credentials)
+
+    try:
+        return googleapiclient.discovery.build(
+            "youtube", "v3", credentials=credentials)
+    except Exception as e:
+        print(f"Error building YouTube service: {e}")
+        return None
 
 def generate_seo_metadata(video_title, video_description, video_tags):
     # This function would ideally use an LLM to generate SEO-optimized content.
     # For now, it uses the provided inputs directly.
-    # In a real scenario, you'd integrate with an LLM API here.
+    # In a real scenario, you\'d integrate with an LLM API here.
     print("Generating SEO metadata (placeholder)...")
     return {
         "title": video_title,
@@ -95,8 +101,8 @@ def upload_video(
 if __name__ == "__main__":
     # This part is for local testing and demonstration purposes.
     # In the actual workflow, main.py will call these functions.
-    print("This script is intended to be called by main.py or a GitHub Action.")
-    print("Please ensure YOUTUBE_CLIENT_SECRETS_FILE is set and points to your client_secrets.json.")
+    print("This script is intended to be called by a GitHub Action.")
+    print("Please ensure YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET, and YOUTUBE_REFRESH_TOKEN are set as environment variables.")
     print("Also ensure YOUTUBE_VIDEO_PATH, YOUTUBE_TITLE, YOUTUBE_DESCRIPTION, YOUTUBE_TAGS, YOUTUBE_THUMBNAIL_PATH are set.")
 
     # Example usage (will not run without proper setup):
@@ -108,7 +114,7 @@ if __name__ == "__main__":
     #     video_tags = os.environ.get("YOUTUBE_TAGS", "AI,documentary,automation")
     #     thumbnail_path = os.environ.get("YOUTUBE_THUMBNAIL_PATH")
 
-    #     metadata = generate_seo_metadata(video_title, video_description, video_tags)
+    #     seo_metadata = generate_seo_metadata(video_title, video_description, video_tags)
 
     #     # Schedule for 24 hours from now (example)
     #     scheduled_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
@@ -116,10 +122,10 @@ if __name__ == "__main__":
     #     upload_video(
     #         youtube,
     #         video_path,
-    #         metadata["title"],
-    #         metadata["description"],
-    #         metadata["tags"],
-    #         metadata["category_id"],
+    #         seo_metadata["title"],
+    #         seo_metadata["description"],
+    #         seo_metadata["tags"],
+    #         seo_metadata["category_id"],
     #         privacy_status="private", # Set to public or unlisted after scheduling
     #         scheduled_date=scheduled_time,
     #         thumbnail_path=thumbnail_path

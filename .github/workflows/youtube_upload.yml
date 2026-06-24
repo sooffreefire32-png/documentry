@@ -32,13 +32,13 @@ jobs:
         name: final-documentary-video
         path: output/
 
-    - name: Prepare YouTube Client Secrets
-      run: |
-        echo "${{ secrets.YOUTUBE_CLIENT_SECRETS }}" > client_secrets.json
-        echo "YOUTUBE_CLIENT_SECRETS_FILE=client_secrets.json" >> $GITHUB_ENV
+
 
     - name: Run YouTube Uploader
       env:
+        YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+        YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+        YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         YOUTUBE_VIDEO_PATH: output/final_video.mp4
         YOUTUBE_TITLE: "Your AI Generated Documentary Title"
         YOUTUBE_DESCRIPTION: "This is an AI-generated documentary video. #AI #Documentary #Automation"
