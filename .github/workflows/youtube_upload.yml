@@ -38,14 +38,23 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: pipeline-reports
-        path: output/
+        path: .
         run-id: ${{ github.event.workflow_run.id }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: List downloaded files (Debug)
+      run: ls -R
 
     - name: Load SEO data
       id: seo_data
       run: |
-        SEO_DATA=$(cat output/youtube_seo_data.json)
+        # Search for the file in case it's nested
+        SEO_FILE=$(find . -name "youtube_seo_data.json" | head -n 1)
+        if [ -z "$SEO_FILE" ]; then
+          echo "Error: youtube_seo_data.json not found"
+          exit 1
+        fi
+        SEO_DATA=$(cat "$SEO_FILE")
         echo "title=$(echo $SEO_DATA | jq -r '.title')" >> $GITHUB_OUTPUT
         echo "description=$(echo $SEO_DATA | jq -r '.description')" >> $GITHUB_OUTPUT
         echo "tags=$(echo $SEO_DATA | jq -r '.tags')" >> $GITHUB_OUTPUT
