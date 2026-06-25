@@ -31,12 +31,16 @@ jobs:
       with:
         name: final-documentary-video
         path: output/
+        run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Download SEO data artifact
       uses: actions/download-artifact@v4
       with:
-        name: pipeline-reports # This artifact contains youtube_seo_data.json
+        name: pipeline-reports
         path: output/
+        run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Load SEO data
       id: seo_data
